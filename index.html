@@ -1,0 +1,3355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AutoCare Pro - Your Personal Car Maintenance Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* --- CSS Variables & Base Styles --- */
+    :root {
+      /* Colors */
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-primary-light: #dbeafe;
+      --color-secondary: #64748b;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --color-info: #06b6d4;
+
+      /* Light Theme */
+      --color-bg-body: #f8fafc;
+      --color-bg-container: #ffffff;
+      --color-bg-card: #ffffff;
+      --color-bg-input: #f1f5f9;
+      --color-text: #0f172a;
+      --color-text-muted: #475569;
+      --color-text-subtle: #94a3b8;
+      --color-text-light: #ffffff;
+      --color-border: #e2e8f0;
+      --color-divider: #cbd5e1;
+
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+      /* Typography */
+      --font-family: 'Inter', system-ui, sans-serif;
+      --border-radius-sm: 6px;
+      --border-radius-md: 10px;
+      --border-radius-lg: 14px;
+      --transition-fast: 0.15s ease-out;
+      --transition-normal: 0.3s ease-in-out;
+    }
+
+    /* Dark Theme */
+    body.dark {
+      --color-bg-body: #0f172a;
+      --color-bg-container: #1e293b;
+      --color-bg-card: #1e293b;
+      --color-bg-input: #334155;
+      --color-text: #f1f5f9;
+      --color-text-muted: #cbd5e1;
+      --color-text-subtle: #64748b;
+      --color-border: #334155;
+      --color-divider: #475569;
+    }
+
+    /* Base */
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-body);
+      color: var(--color-text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      transition: background-color var(--transition-normal);
+      line-height: 1.6;
+    }
+    h1, h2, h3, h4 { margin: 0 0 0.5rem 0; font-weight: 700; }
+    h1 { font-size: 2.5rem; letter-spacing: -0.025em; }
+    h2 { font-size: 2rem; letter-spacing: -0.025em; }
+    h3 { font-size: 1.5rem; }
+    h4 { font-size: 1.25rem; }
+    p { margin: 0 0 1rem 0; }
+
+    .container {
+      width: 100%; max-width: 1200px;
+      background-color: var(--color-bg-container);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      min-height: 700px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--color-border);
+      transition: background-color var(--transition-normal);
+    }
+
+    /* --- NEW PROFILE SYSTEM STYLES --- */
+    
+    /* Profile Completion */
+    .profile-completion {
+      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: var(--border-radius-md);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .profile-completion h3 {
+      margin: 0 0 0.5rem 0;
+      color: white;
+    }
+    .profile-completion p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    /* User Profile in Header */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-right: 1rem;
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .user-name {
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    /* Notification Preferences */
+    .notification-preferences {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .notification-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--color-bg-input);
+      border-radius: var(--border-radius-sm);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .notification-option:hover {
+      border-color: var(--color-primary);
+    }
+    .notification-option.selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+    .notification-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--color-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+    .notification-details {
+      flex-grow: 1;
+    }
+    .notification-details h4 {
+      margin: 0 0 0.25rem 0;
+      color: var(--color-text);
+    }
+    .notification-details p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+    .notification-toggle {
+      margin-left: auto;
+    }
+
+    /* Enhanced Form Styles */
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    .form-section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--color-primary);
+    }
+
+    /* Progress Steps */
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 2rem 0;
+      position: relative;
+    }
+    .progress-steps::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--color-border);
+      z-index: 1;
+    }
+    .progress-step {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      flex: 1;
+    }
+    .step-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--color-bg-input);
+      border: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.5rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+    .step-label {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+    .progress-step.active .step-number {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: white;
+    }
+    .progress-step.active .step-label {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    .progress-step.completed .step-number {
+      background: var(--color-success);
+      border-color: var(--color-success);
+      color: white;
+    }
+
+    /* Booking Confirmation */
+    .booking-confirmation {
+      background: var(--color-success);
+      color: white;
+      padding: 1rem;
+      border-radius: var(--border-radius-md);
+      margin: 1rem 0;
+      text-align: center;
+    }
+    .confirmation-details {
+      background: var(--color-bg-input);
+      padding: 1rem;
+      border-radius: var(--border-radius-sm);
+      margin: 1rem 0;
+    }
+
+    /* --- Header & Nav --- */
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.5rem 2rem; border-bottom: 1px solid var(--color-divider);
+      background-color: var(--color-bg-card);
+    }
+    .logo {
+      font-size: 1.4rem; font-weight: 800; color: var(--color-primary);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .logo svg { width: 28px; height: 28px; }
+
+    /* Vehicle Switcher */
+    .vehicle-switcher {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-right: 1rem;
+    }
+    .vehicle-pill {
+      background: var(--color-bg-input);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    .vehicle-pill.active {
+      background: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    .vehicle-pill:hover:not(.active) {
+      border-color: var(--color-primary);
+    }
+    .add-vehicle-btn {
+      background: none;
+      border: 2px dashed var(--color-border);
+      color: var(--color-text-muted);
+      padding: 0.4rem;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .add-vehicle-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .nav { display: flex; align-items: center; gap: 0.5rem; }
+    .nav button, .nav-btn {
+      background: none; border: none; padding: 0.6rem 1.2rem;
+      color: var(--color-text-muted); font-size: 1.05rem; font-weight: 600;
+      border-radius: var(--border-radius-sm); cursor: pointer;
+      transition: color var(--transition-fast), background-color var(--transition-fast);
+    }
+    .nav #navDashboard { opacity: 0; pointer-events: none; }
+    .nav #navDashboard.visible { opacity: 1; pointer-events: auto; }
+    .nav button:hover, .nav-btn:hover { color: var(--color-text); background-color: var(--color-bg-input); }
+    .nav button.active, .nav-btn.active { color: var(--color-primary); background-color: var(--color-bg-input); }
+
+    /* Notification Center */
+    .notification-center {
+      position: relative;
+    }
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--color-danger);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+    .notification-panel {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-lg);
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    .notification-panel.show {
+      display: block;
+    }
+    .notification-item {
+      padding: 1rem;
+      border-bottom: 1px solid var(--color-divider);
+      cursor: pointer;
+    }
+    .notification-item:last-child {
+      border-bottom: none;
+    }
+    .notification-item.unread {
+      background: var(--color-primary-light);
+    }
+    .notification-title {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .notification-message {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+    .notification-time {
+      font-size: 0.8rem;
+      color: var(--color-text-subtle);
+      margin-top: 0.25rem;
+    }
+
+    /* Shopping Cart */
+    .cart-center {
+      position: relative;
+    }
+    .cart-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    /* --- Content & Screens --- */
+    .content-area { flex-grow: 1; padding: 2rem; overflow-y: auto; }
+    .screen {
+      display: none;
+      flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--transition-normal);
+    }
+    .screen.active { display: flex; opacity: 1; pointer-events: auto; }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .quick-action {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .quick-action:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .quick-action-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--color-primary-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+    }
+
+    /* Cost Savings Dashboard */
+    .savings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .savings-card {
+      background: var(--color-bg-card);
+      padding: 1.5rem;
+      border-radius: var(--border-radius-md);
+      text-align: center;
+      border: 1px solid var(--color-border);
+    }
+    .savings-amount {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-success);
+      margin-bottom: 0.5rem;
+    }
+    .savings-label {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Enhanced Health Score */
+    .health-breakdown {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .health-metric {
+      text-align: center;
+      padding: 1rem;
+      background: var(--color-bg-input);
+      border-radius: var(--border-radius-sm);
+    }
+    .health-metric-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+    .health-metric-label {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Service History */
+    .service-history {
+      margin-top: 1.5rem;
+      border-top: 1px solid var(--color-divider);
+      padding-top: 1rem;
+    }
+    .history-item {
+      background: var(--color-bg-input);
+      padding: 1rem;
+      border-radius: var(--border-radius-sm);
+      margin-bottom: 0.75rem;
+      border-left: 4px solid var(--color-success);
+    }
+    .history-item.expensive {
+      border-left-color: var(--color-warning);
+    }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+    .history-cost {
+      font-weight: 800;
+      color: var(--color-text);
+    }
+    .history-date {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+    .history-garage {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* --- Buttons --- */
+    button {
+      padding: 0.8rem 1.6rem;
+      border-radius: var(--border-radius-sm);
+      font-size: 1.05rem; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+      transition: background-color var(--transition-fast), box-shadow var(--transition-fast), transform 0.1s ease;
+      border: 1px solid transparent;
+    }
+    .btn-primary { background-color: var(--color-primary); color: var(--color-text-light); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover { background-color: var(--color-primary-dark); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary { background-color: var(--color-bg-input); color: var(--color-text); border-color: var(--color-border); }
+    .btn-secondary:hover { background-color: var(--color-divider); }
+    .btn-outline { background: none; color: var(--color-primary); border-color: var(--color-primary); padding: 0.7rem 1.5rem; }
+    .btn-outline:hover { background-color: rgba(37, 99, 235, 0.05); }
+    .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.9rem; }
+    .btn-cancel { background-color: var(--color-secondary); color: var(--color-text-light); }
+    .btn-cancel:hover { background-color: #4b5563; }
+    .btn-danger { background-color: var(--color-danger); color: var(--color-text-light); }
+    .btn-danger:hover { background-color: #DC2626; }
+
+    /* --- Forms --- */
+    form { width: 100%; max-width: 460px; text-align: left; margin-top: 1.2rem; }
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group label { display: block; margin-bottom: 0.45rem; font-weight: 700; color: var(--color-text); font-size: 0.95rem; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 0.9rem 1rem; border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm); font-size: 1rem; color: var(--color-text);
+      background-color: var(--color-bg-input);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+      -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none; border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22);
+      background-color: var(--color-bg-card);
+    }
+    .form-group select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748B'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a 1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.75rem center;
+      background-size: 1.5em; padding-right: 2.5rem;
+    }
+    .form-actions { margin-top: 1.2rem; display: flex; justify-content: center; gap: 0.8rem; }
+    .form-actions button { flex: 1; }
+
+    /* --- Dashboard Grid & Cards --- */
+    .dashboard-grid {
+      display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+      width: 100%; max-width: 100%; margin: 0 auto;
+    }
+    @media (min-width: 900px) {
+      .dashboard-grid { grid-template-columns: 2fr 1fr; }
+      .dashboard-grid .span-2 { grid-column: span 2; }
+    }
+    .card {
+      background-color: var(--color-bg-card); border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-sm); padding: 1.5rem; text-align: left;
+      border: 1px solid var(--color-border);
+      transition: box-shadow var(--transition-fast), transform 0.1s ease, border-color var(--transition-fast);
+    }
+    .card:hover { box-shadow: var(--shadow-md); border-color: var(--color-divider); }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; border-bottom: 1px solid var(--color-divider); padding-bottom: 0.8rem;
+    }
+    .card-header h3 { margin: 0; font-weight: 700; }
+
+    /* Car Info Card */
+    #carDetails { display: flex; flex-direction: column; gap: 0.75rem; }
+    #carDetails .car-name { font-size: 1.55rem; font-weight: 800; color: var(--color-primary); }
+    #carDetails .car-specs { display: flex; flex-wrap: wrap; gap: 0.8rem 1.8rem; font-size: 0.95rem; color: var(--color-text-muted); }
+    #carDetails .car-specs span { display: flex; align-items: center; gap: 0.4rem; }
+    #carDetails .car-specs svg { width: 20px; height: 20px; fill: var(--color-primary); }
+
+    /* Insights Card */
+    #insightsCard .insight-item {
+      margin-bottom: 0.8rem; padding: 1rem; border-radius: var(--border-radius-sm);
+      background-color: var(--color-bg-input); display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.95rem;
+      border-left: 4px solid var(--color-primary);
+    }
+    #insightsCard .insight-item svg { flex-shrink: 0; width: 20px; height: 20px; fill: var(--color-primary); margin-top: 2px; }
+    #insightsCard .insight-item span strong { color: var(--color-text); display: block; margin-bottom: 0.15rem; font-weight: 700; }
+    #insightsCard .insight-item.warning { border-left-color: var(--color-warning); }
+    #insightsCard .insight-item.warning svg { fill: var(--color-warning); }
+    #insightsCard .insight-item.info { border-left-color: var(--color-info); }
+    #insightsCard .insight-item.info svg { fill: var(--color-info); }
+
+    /* Maintenance List */
+    .maintenance-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .maintenance-item {
+      background-color: var(--color-bg-card); border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm); padding: 1rem 1.2rem;
+      display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+      transition: box-shadow var(--transition-fast), transform 0.1s ease, border-color var(--transition-fast), background var(--transition-fast);
+      position: relative;
+    }
+    .maintenance-item:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--color-primary); }
+    .maintenance-item.completed { opacity: 0.85; background: linear-gradient(0deg, rgba(16,185,129,.08), transparent); border-color: var(--color-success); }
+    .maintenance-item.completed .details strong, .maintenance-item.completed .details span { text-decoration: line-through; color: var(--color-text-subtle); }
+    .maintenance-item.overdue { border-left: 5px solid var(--color-danger); background: linear-gradient(0deg, rgba(239,68,68,.08), transparent); }
+    .maintenance-item.due-soon { border-left: 5px solid var(--color-warning); background: linear-gradient(0deg, rgba(245,158,11,.08), transparent); }
+
+    .maintenance-item .details { flex-grow: 1; text-align: left; margin-right: 1rem; }
+    .maintenance-item .details strong { display: block; font-size: 1.1rem; color: var(--color-text); margin-bottom: 0.15rem; font-weight: 700; }
+    .maintenance-item .details span { font-size: 0.92rem; color: var(--color-text-muted); }
+    .maintenance-item .status { font-weight: 800; font-size: 0.85rem; padding: 0.3em 0.7em; border-radius: 9999px; white-space: nowrap; }
+    .maintenance-item.overdue .status { color: var(--color-danger); background-color: rgba(239,68,68,.15); }
+    .maintenance-item.due-soon .status { color: var(--color-warning); background-color: rgba(245,158,11,.18); }
+    .maintenance-item.upcoming .status { color: var(--color-primary); background-color: rgba(37,99,235,.18); }
+    .maintenance-item.completed .status { color: var(--color-success); background-color: rgba(16,185,129,.18); }
+
+    /* Book Now Icon */
+    .book-now-icon {
+      background: var(--color-primary);
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 0.5rem;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    .book-now-icon:hover {
+      background: var(--color-primary-dark);
+    }
+
+    /* Overall Health Progress */
+    .progress-card { text-align: center; }
+    .progress-circle {
+      position: relative; width: 130px; height: 130px; border-radius: 50%;
+      background-color: var(--color-bg-input);
+      display: flex; justify-content: center; align-items: center;
+      font-size: 2.1rem; font-weight: 800; color: var(--color-primary);
+      margin: 1.2rem auto;
+    }
+    .progress-circle svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+    .progress-circle circle { stroke-dasharray: 377; stroke-dashoffset: 377; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+    .progress-circle .bg-circle { stroke: var(--color-border); stroke-width: 10; fill: none; }
+    .progress-circle .fill-circle { stroke: var(--color-primary); stroke-width: 10; fill: none; }
+
+    /* Analytics Chart */
+    .chart-container {
+      position: relative; height: 220px; width: 100%;
+      display: flex; align-items: flex-end; gap: 12px; padding-bottom: 0.5rem;
+      padding-inline: 1.5rem;
+    }
+    .chart-bar {
+      flex: 1; background-color: var(--color-primary);
+      border-radius: 8px 8px 0 0; position: relative;
+      display: flex; justify-content: center; align-items: flex-end;
+      padding-bottom: 8px; color: var(--color-text-light); font-size: 0.85rem; font-weight: 700;
+      height: 0; transition: height 0.65s ease;
+      box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+    }
+    .chart-bar.savings { background-color: var(--color-success); }
+    .chart-bar::before {
+      content: attr(data-value);
+      position: absolute; top: -1.8em; font-size: 0.8rem; color: var(--color-text-muted); opacity: 0.9;
+    }
+    .chart-bar span {
+      position: absolute; bottom: -20px; font-size: 0.8rem; color: var(--color-text-muted); white-space: nowrap;
+    }
+
+    /* --- Enhanced Modal Styles --- */
+    .modal-overlay {
+      position: fixed; 
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex; 
+      justify-content: center; 
+      align-items: flex-start; /* Changed from center to flex-start */
+      z-index: 1000; 
+      opacity: 0; 
+      pointer-events: none; 
+      transition: opacity var(--transition-normal);
+      padding: 20px; /* Added padding */
+      overflow-y: auto; /* Allow scrolling for the overlay */
+    }
+    .modal-overlay.active { 
+      opacity: 1; 
+      pointer-events: all; 
+    }
+    .modal-content {
+      background-color: var(--color-bg-card);
+      padding: 1.5rem; /* Reduced padding */
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%; 
+      max-width: 500px; /* Reduced max-width */
+      max-height: 85vh; /* Limit height */
+      overflow-y: auto; /* Make content scrollable */
+      transform: translateY(30px) scale(.95);
+      border: 1px solid var(--color-border);
+      transition: transform var(--transition-normal);
+      text-align: left;
+      margin: auto; /* Center vertically when possible */
+    }
+    .modal-overlay.active .modal-content { 
+      transform: translateY(0) scale(1); 
+    }
+
+    /* Improved modal content layout */
+    .modal-content h3 { 
+      margin-top: 0; 
+      font-size: 1.5rem; /* Slightly smaller heading */
+      margin-bottom: 0.8rem; 
+      line-height: 1.3;
+    }
+    .modal-content p { 
+      font-size: 0.95rem; 
+      margin-bottom: 0.9rem; 
+      color: var(--color-text-muted); 
+      line-height: 1.5;
+    }
+    .modal-content ul { 
+      list-style: none; 
+      padding: 0; 
+      margin: 1.2rem 0; 
+      border-top: 1px solid var(--color-divider); 
+      padding-top: 1rem; 
+    }
+    .modal-content ul li { 
+      margin-bottom: 0.6rem; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      font-size: 0.95rem; 
+      flex-wrap: wrap; /* Allow wrapping on small screens */
+    }
+    .modal-content ul li span:first-child { 
+      color: var(--color-text-muted); 
+      margin-right: 10px;
+    }
+    .modal-content ul li span:last-child { 
+      font-weight: 700; 
+      color: var(--color-text); 
+      text-align: right;
+      flex: 1;
+      min-width: 120px;
+    }
+    .modal-actions { 
+      display: flex; 
+      justify-content: flex-end; 
+      gap: 0.8rem; 
+      margin-top: 1.5rem; 
+      border-top: 1px solid var(--color-divider); 
+      padding-top: 1.2rem; 
+      flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+    }
+    .modal-actions button {
+      flex: 1;
+      min-width: 120px; /* Ensure buttons don't get too small */
+    }
+
+    /* Improved section spacing in modal */
+    .buy-parts-section,
+    .garage-booking-section {
+      margin: 1.2rem 0;
+      padding: 0.8rem;
+    }
+    
+    .buy-parts-section h4,
+    .garage-booking-section h4 {
+      margin-top: 0;
+      margin-bottom: 0.8rem;
+      font-size: 1.1rem;
+    }
+
+    /* Better responsive behavior for modal */
+    @media (max-width: 600px) {
+      .modal-overlay {
+        padding: 10px;
+        align-items: flex-start;
+      }
+      .modal-content {
+        padding: 1rem;
+        max-height: 90vh;
+      }
+      .modal-content h3 {
+        font-size: 1.3rem;
+      }
+      .modal-content ul li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+      }
+      .modal-content ul li span:last-child {
+        text-align: left;
+        min-width: auto;
+      }
+      .modal-actions {
+        flex-direction: column;
+      }
+      .modal-actions button {
+        width: 100%;
+      }
+      .time-slots {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .modal-content {
+        padding: 0.8rem;
+      }
+      .buy-parts-section,
+      .garage-booking-section {
+        padding: 0.6rem;
+      }
+    }
+
+    /* Buy Parts Section - UPDATED STYLES */
+    .buy-parts-section {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background-color: var(--color-bg-input);
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--color-border);
+    }
+    .buy-parts-section h4 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: var(--color-primary);
+    }
+    .parts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .part-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: var(--color-bg-card);
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--color-border);
+      transition: all var(--transition-fast);
+    }
+    .part-item:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .part-image {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: var(--border-radius-sm);
+      flex-shrink: 0;
+      background-color: var(--color-bg-input);
+      padding: 8px;
+      border: 1px solid var(--color-border);
+    }
+    .part-info {
+      flex-grow: 1;
+    }
+    .part-name {
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.25rem;
+      font-size: 1rem;
+    }
+    .part-price {
+      font-size: 0.95rem;
+      color: var(--color-success);
+      font-weight: 700;
+    }
+    .buy-button {
+      padding: 0.6rem 1.2rem;
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+    .buy-button:hover {
+      background-color: var(--color-primary-dark);
+    }
+
+    /* Garage Booking Section */
+    .garage-booking-section {
+      margin: 1.5rem 0;
+    }
+    .garage-booking-section h4 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: var(--color-primary);
+    }
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .time-slot {
+      padding: 0.75rem;
+      background-color: var(--color-bg-input);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .time-slot:hover {
+      background-color: var(--color-primary-light);
+      border-color: var(--color-primary);
+    }
+    .time-slot.selected {
+      background-color: var(--color-primary);
+      color: white;
+      border-color: var(--color-primary);
+    }
+    .time-slot-date {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .time-slot-time {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+    .time-slot.selected .time-slot-time {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* --- Toasts --- */
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      min-width: 260px;
+      max-width: 360px;
+      color: #fff;
+      padding: 0.9rem 1.2rem;
+      border-radius: 10px;
+      box-shadow: var(--shadow-md);
+      display: flex; align-items: center; gap: 0.6rem;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .3s ease, transform .3s ease;
+      z-index: 2000;
+      pointer-events: none;
+      font-weight: 700;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast-success { background: var(--color-success); }
+    .toast-warning { background: var(--color-warning); }
+    .toast-error { background: var(--color-danger); }
+
+    /* Investor Section */
+    .investor-section {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--color-divider);
+    }
+    .investor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .investor-card {
+      background: var(--color-bg-card);
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+    .investor-card h4 {
+      color: var(--color-primary);
+      margin-bottom: 0.75rem;
+    }
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin-bottom: 0.5rem;
+    }
+    .metric-label {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Print Styles for Reports */
+    @media print {
+      .nav, .quick-actions, .btn-outline, .book-now-icon, .vehicle-switcher, .notification-center {
+        display: none !important;
+      }
+      .container {
+        box-shadow: none !important;
+        border: none !important;
+      }
+    }
+
+    /* --- Utility & Responsive --- */
+    .text-center { text-align: center; }
+    .mt-4 { margin-top: 1rem; }
+    .mt-8 { margin-top: 2rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .w-full { width: 100%; }
+
+    /* Additional responsive styles for new features */
+    @media (max-width: 768px) {
+      .user-profile .user-name {
+        display: none;
+      }
+      .progress-steps {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .progress-steps::before {
+        display: none;
+      }
+      .progress-step {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        text-align: left;
+      }
+      .step-number {
+        margin: 0;
+      }
+      .notification-preferences {
+        gap: 0.75rem;
+      }
+      .notification-option {
+        padding: 0.75rem;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .container { min-height: unset; border-radius: var(--border-radius-md); }
+      .header { flex-direction: column; gap: 0.8rem; padding: 1.2rem 1rem; }
+      .vehicle-switcher { margin-right: 0; order: 3; width: 100%; justify-content: center; }
+      .content-area, .screen { padding: 1.2rem; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.25rem; }
+      .nav button, .nav-btn { font-size: 0.9rem; padding: 0.5rem 1rem; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .form-actions { flex-direction: column; gap: 0.8rem; }
+      .form-actions button { width: 100%; }
+      body { padding: 10px; align-items: flex-start; }
+      .chart-container { padding-inline: 0.5rem; gap: 8px; }
+      .investor-grid { grid-template-columns: 1fr; }
+      .time-slots { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: repeat(2, 1fr); }
+      .savings-grid { grid-template-columns: 1fr; }
+      .health-breakdown { grid-template-columns: repeat(2, 1fr); }
+      .notification-panel { width: 280px; right: -50px; }
+      
+      /* Responsive styles for part items - UPDATED */
+      .part-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+      }
+      
+      .part-image {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    /* --- CHECKOUT STYLES --- */
+    .checkout-section {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: var(--color-bg-input);
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .checkout-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .checkout-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--color-divider);
+    }
+
+    .checkout-totals {
+      border-top: 2px solid var(--color-border);
+      padding-top: 1rem;
+    }
+
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .total-line.total {
+      font-weight: 700;
+      font-size: 1.2rem;
+      border-top: 1px solid var(--color-divider);
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .payment-options {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkout-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      border-top: 1px solid var(--color-divider);
+      padding-top: 1.5rem;
+    }
+
+    .checkout-actions button {
+      flex: 1;
+    }
+
+    .card-details {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--color-bg-card);
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .order-confirmation {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .confirmation-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--color-success);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: white;
+    }
+
+    .order-summary {
+      background: var(--color-bg-input);
+      padding: 1.5rem;
+      border-radius: var(--border-radius-sm);
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+
+    .order-summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .order-summary-total {
+      border-top: 1px solid var(--color-border);
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="application">
+    <header class="header">
+      <div class="logo" aria-label="AutoCare Pro">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" aria-hidden="true">
+          <path fill="var(--color-primary)" d="M7 21c.4-2.1 1.7-4 3.5-5.1l6.3-3.9c1.2-.7 2.6-1.1 4-1.1h12.1c1.7 0 3.2.8 4.2 2.1l2.8 3.7H54c2.2 0 4 1.8 4 4v4.5c0 .8-.7 1.5-1.5 1.5h-2.7a5 5 0 0 1-9.6 0H19.8a5 5 0 0 1-9.6 0H7.5c-.8 0-1.5-.7-1.5-1.5V22c0-.3 0-.6.1-1zM20 26.5a3.5 3.5 0 1 0-7 0 3.5 3.5 0 0 0 7 0zm30 0a3.5 3.5 0 1 0-7 0 3.5 3.5 0 0 0 7 0z"/>
+        </svg>
+        AutoCare Pro
+      </div>
+      
+      <!-- User Profile -->
+      <div class="user-profile" id="userProfile" style="display: none;">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <span class="user-name" id="userName">User</span>
+      </div>
+
+      <!-- Vehicle Switcher -->
+      <div class="vehicle-switcher" id="vehicleSwitcher">
+        <!-- Vehicles will be populated dynamically -->
+      </div>
+
+      <nav class="nav" role="navigation" aria-label="Primary">
+        <!-- Shopping Cart -->
+        <div class="cart-center">
+          <button id="cartButton" class="nav-btn" aria-label="Shopping Cart">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <div class="cart-badge" id="cartBadge" style="display: none;">0</div>
+          </button>
+        </div>
+
+        <!-- Notification Bell -->
+        <div class="notification-center">
+          <button id="notificationBell" class="nav-btn" aria-label="Notifications">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <div class="notification-badge" id="notificationBadge" style="display: none;">0</div>
+          </button>
+          <div class="notification-panel" id="notificationPanel">
+            <div class="notification-item unread">
+              <div class="notification-title">Brake Service Due</div>
+              <div class="notification-message">Your brake pads need replacement in approximately 1,200 km</div>
+              <div class="notification-time">2 hours ago</div>
+            </div>
+            <div class="notification-item">
+              <div class="notification-title">Oil Change Completed</div>
+              <div class="notification-message">You saved €45 by doing it proactively vs emergency repair</div>
+              <div class="notification-time">1 day ago</div>
+            </div>
+          </div>
+        </div>
+
+        <button id="navHome" class="active" aria-controls="homeScreen">Home</button>
+        <button id="navDashboard" aria-controls="dashboardScreen">Dashboard</button>
+        <button id="navInvestor" aria-controls="investorScreen">Investor Info</button>
+        <button id="navSettings" aria-controls="settingsScreen">Settings</button>
+      </nav>
+    </header>
+
+    <main class="content-area">
+      <!-- Home Screen - Landing Page -->
+      <section id="homeScreen" class="screen active" aria-labelledby="homeTitle">
+        <div class="w-full" style="max-width:560px; margin-inline:auto;">
+          <h1 id="homeTitle">Never worry about car repairs again</h1>
+          <p class="mb-4" style="color:var(--color-secondary);">
+            AutoCare Pro prevents expensive surprises by predicting maintenance needs before they become emergencies. <strong>Save money, reduce stress, protect your investment.</strong>
+          </p>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <div class="quick-action" onclick="handleGetStarted()">
+              <div class="quick-action-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m7-7H5"/></svg>
+              </div>
+              <div>Get Started</div>
+            </div>
+            <div class="quick-action" onclick="showScreen('dashboard')">
+              <div class="quick-action-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              </div>
+              <div>View Dashboard</div>
+            </div>
+            <div class="quick-action" onclick="generateMaintenanceReport()">
+              <div class="quick-action-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              
+              <div>Settings</div>
+            </div>
+            
+          </div>
+
+          <div class="mt-8" style="display:flex; flex-direction:column; gap:1rem;">
+            <button id="createPlanBtn" class="btn-primary" onclick="handleGetStarted()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v14m7-7H5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+              Start Protecting My Car
+            </button>
+            <button id="watchDemoBtn" class="btn-secondary" onclick="demoModal.classList.add('active')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              See How It Works
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Setup Screen -->
+      <section id="profileScreen" class="screen" aria-labelledby="profileTitle">
+        <div class="w-full" style="max-width:560px; margin-inline:auto;">
+          <h2 id="profileTitle">Let's personalize your AutoCare Pro experience</h2>
+          <p class="mb-4" style="color:var(--color-secondary);">
+            We'll use this information to provide better maintenance recommendations and connect you with local service providers.
+          </p>
+
+          <!-- Progress Steps -->
+          <div class="progress-steps">
+            <div class="progress-step active">
+              <div class="step-number">1</div>
+              <div class="step-label">Profile</div>
+            </div>
+            <div class="progress-step">
+              <div class="step-number">2</div>
+              <div class="step-label">Vehicle</div>
+            </div>
+            <div class="progress-step">
+              <div class="step-number">3</div>
+              <div class="step-label">Dashboard</div>
+            </div>
+          </div>
+
+          <form id="profileForm">
+            <div class="form-section">
+              <h3 class="form-section-title">Personal Information</h3>
+              <div class="form-group">
+                <label for="userFullName">Full Name</label>
+                <input type="text" id="userFullName" placeholder="Enter your full name" required>
+              </div>
+              <div class="form-group">
+                <label for="userEmail">Email Address</label>
+                <input type="email" id="userEmail" placeholder="your.email@example.com" required>
+              </div>
+              <div class="form-group">
+                <label for="userPhone">Phone Number</label>
+                <input type="tel" id="userPhone" placeholder="+1 (555) 123-4567" required>
+              </div>
+              <div class="form-group">
+                <label for="userLocation">Location (City/Zip Code)</label>
+                <input type="text" id="userLocation" placeholder="New York, NY or 10001" required>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3 class="form-section-title">Notification Preferences</h3>
+              <p style="color:var(--color-text-muted); margin-bottom: 1rem;">
+                How would you like to receive maintenance reminders and service updates?
+              </p>
+              
+              <div class="notification-preferences">
+                <div class="notification-option" id="emailOption">
+                  <div class="notification-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                  </div>
+                  <div class="notification-details">
+                    <h4>Email Notifications</h4>
+                    <p>Receive detailed maintenance reports, service confirmations, and cost savings updates</p>
+                  </div>
+                  <div class="notification-toggle">
+                    <input type="checkbox" id="emailNotifications" checked>
+                  </div>
+                </div>
+
+                <div class="notification-option" id="smsOption">
+                  <div class="notification-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                  </div>
+                  <div class="notification-details">
+                    <h4>SMS/Text Messages</h4>
+                    <p>Get urgent alerts and 24-hour appointment reminders directly to your phone</p>
+                  </div>
+                  <div class="notification-toggle">
+                    <input type="checkbox" id="smsNotifications" checked>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary w-full">
+                Continue to Vehicle Setup
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Add Car Screen -->
+      <section id="addCarScreen" class="screen" aria-labelledby="addCarTitle">
+        <div class="w-full" style="max-width:560px; margin-inline:auto;">
+          <h2 id="addCarTitle">Setup Your Vehicle Profile</h2>
+          <p class="mb-4" style="color:var(--color-secondary);">We need a few details to build your custom predictive plan.</p>
+
+          <!-- Progress Steps -->
+          <div class="progress-steps">
+            <div class="progress-step completed">
+              <div class="step-number">✓</div>
+              <div class="step-label">Profile</div>
+            </div>
+            <div class="progress-step active">
+              <div class="step-number">2</div>
+              <div class="step-label">Vehicle</div>
+            </div>
+            <div class="progress-step">
+              <div class="step-number">3</div>
+              <div class="step-label">Dashboard</div>
+            </div>
+          </div>
+
+          <form id="addCarForm">
+            <div class="form-group">
+              <label for="carMake">Make</label>
+              <input type="text" id="carMake" placeholder="e.g., Tesla, Honda" value="BMW" required>
+            </div>
+            <div class="form-group">
+              <label for="carModel">Model</label>
+              <input type="text" id="carModel" placeholder="e.g., Model 3, Civic" value="X5" required>
+            </div>
+            <div class="form-group">
+              <label for="carYear">Year</label>
+              <input type="number" id="carYear" placeholder="e.g., 2022" min="1990" max="2026" value="2021" required>
+            </div>
+            <div class="form-group">
+              <label for="currentMileage">Current Mileage (km)</label>
+              <input type="number" id="currentMileage" placeholder="e.g., 45000" min="0" value="48000" required>
+            </div>
+            <div class="form-group">
+              <label for="averageYearlyMileage">Average Yearly Mileage (km)</label>
+              <input type="number" id="averageYearlyMileage" placeholder="e.g., 15000" min="0" value="12000" required>
+            </div>
+            <div class="form-group">
+              <label for="lastServiceDate">Last Major Service Date</label>
+              <input type="date" id="lastServiceDate" value="2023-08-15" required>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary w-full">
+                View My Dashboard
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Dashboard Screen -->
+      <section id="dashboardScreen" class="screen" aria-labelledby="dashTitle">
+        <h2 id="dashTitle" class="w-full text-center">Your Car's Health & Savings Dashboard</h2>
+        
+        <!-- Cost Savings Overview -->
+        <div class="savings-grid">
+          <div class="savings-card">
+            <div class="savings-amount">€420</div>
+            <div class="savings-label">Saved This Year</div>
+          </div>
+          <div class="savings-card">
+            <div class="savings-amount">€2,100</div>
+            <div class="savings-label">Estimated Resale Value Protection</div>
+          </div>
+          <div class="savings-card">
+            <div class="savings-amount">0</div>
+            <div class="savings-label">Unexpected Repairs</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid mt-8">
+          <!-- Enhanced Vehicle details with health breakdown -->
+          <article class="card" id="carInfoCard">
+            <div class="card-header">
+              <h3>Vehicle Health Overview</h3>
+              <button class="btn-outline btn-sm" onclick="generateMaintenanceReport()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Print Report
+              </button>
+            </div>
+            <div id="carDetails"></div>
+            <div class="health-breakdown">
+              <div class="health-metric">
+                <div class="health-metric-value" style="color:var(--color-success);">98%</div>
+                <div class="health-metric-label">Engine</div>
+              </div>
+              <div class="health-metric">
+                <div class="health-metric-value" style="color:var(--color-warning);">72%</div>
+                <div class="health-metric-label">Brakes</div>
+              </div>
+              <div class="health-metric">
+                <div class="health-metric-value" style="color:var(--color-success);">95%</div>
+                <div class="health-metric-label">Tires</div>
+              </div>
+              <div class="health-metric">
+                <div class="health-metric-value" style="color:var(--color-success);">88%</div>
+                <div class="health-metric-label">Battery</div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Health -->
+          <article class="card text-center progress-card" id="overallHealthCard">
+            <div class="card-header">
+              <h3 class="w-full text-center">Overall Health Score</h3>
+            </div>
+            <div class="progress-circle">
+              <span id="healthPercentage">85%</span>
+              <svg viewBox="0 0 128 128">
+                <circle class="bg-circle" cx="64" cy="64" r="60"></circle>
+                <circle class="fill-circle" cx="64" cy="64" r="60" id="healthProgressCircle"></circle>
+              </svg>
+            </div>
+            <p id="healthMessage" style="font-weight:700;">Excellent! Keep up the great maintenance.</p>
+          </article>
+
+          <!-- Upcoming services -->
+          <article class="card span-2" id="upcomingServicesCard">
+            <div class="card-header">
+              <h3>Predictive Maintenance Schedule</h3>
+              <button class="btn-outline btn-sm" id="fullScheduleBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Full Schedule
+              </button>
+            </div>
+            <div id="maintenanceList" class="maintenance-list"></div>
+          </article>
+
+          <!-- Insights -->
+          <article class="card span-2" id="insightsCard">
+            <div class="card-header"><h3>Smart Insights & Proactive Alerts</h3></div>
+            <div id="smartInsights"></div>
+          </article>
+
+          <!-- Analytics -->
+          <article class="card span-2" id="analyticsCard">
+            <div class="card-header"><h3>Annual Maintenance Cost Trend (Simulated)</h3></div>
+            <div class="chart-container" id="costTrendChart"></div>
+            <p class="mt-4 text-center" style="font-size:0.9rem; color:var(--color-success); font-weight:800;">
+              Proactive maintenance has saved you an estimated €200 this year.
+            </p>
+          </article>
+        </div>
+
+        <!-- Service History Section -->
+        <div class="service-history">
+          <h3>Recent Service History</h3>
+          <div id="serviceHistoryList">
+            <div class="history-item">
+              <div class="history-header">
+                <strong>Oil Change & Filter</strong>
+                <div class="history-cost">€165</div>
+              </div>
+              <div class="history-date">Completed: March 15, 2024</div>
+              <div class="history-garage">QuickLube Center • 48,250 km</div>
+              <div style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-success);">
+                ✓ Saved €45 vs emergency repair
+              </div>
+            </div>
+            <div class="history-item">
+              <div class="history-header">
+                <strong>Tire Rotation & Balance</strong>
+                <div class="history-cost">€45</div>
+              </div>
+              <div class="history-date">Completed: January 22, 2024</div>
+              <div class="history-garage">City Tire Shop • 46,800 km</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Investor Info -->
+      <section id="investorScreen" class="screen" aria-labelledby="investorTitle">
+        <div class="w-full" style="max-width:900px; margin-inline:auto;">
+          <h2 id="investorTitle">Investor Information</h2>
+          <p class="mb-4" style="color:var(--color-secondary);">
+            AutoCare Pro is positioned to disrupt the $400B+ automotive maintenance industry with predictive AI technology.
+          </p>
+          
+          <div class="investor-grid">
+            <div class="investor-card">
+              <h4>Market Opportunity</h4>
+              <div class="metric-value">$400B+</div>
+              <div class="metric-label">Global Automotive Maintenance Market</div>
+              <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--color-text-muted);">
+                With over 1.4 billion vehicles worldwide, the maintenance market represents a massive opportunity for disruption.
+              </p>
+            </div>
+            
+            <div class="investor-card">
+              <h4>Customer Savings</h4>
+              <div class="metric-value">25-40%</div>
+              <div class="metric-label">Average Reduction in Maintenance Costs</div>
+              <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--color-text-muted);">
+                Our predictive approach helps customers avoid costly repairs through proactive maintenance scheduling.
+              </p>
+            </div>
+            
+            <div class="investor-card">
+              <h4>Resale Value</h4>
+              <div class="metric-value">15-25%</div>
+              <div class="metric-label">Higher Resale Value with Maintenance Records</div>
+              <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--color-text-muted);">
+                Complete maintenance documentation significantly increases vehicle resale value.
+              </p>
+            </div>
+          </div>
+          
+          <div class="investor-section">
+            <h3>Competitive Advantage</h3>
+            <div class="card mt-4">
+              <div class="insight-item info" style="display: flex; align-items: center; gap: 2rem; padding: 2rem;">
+                <img src="https://i.postimg.cc/W1p57N80/Data-Driven-Insights-Leverages-millions-of-data-points-to-provide-accurate-maintenance-predictions-a.png" alt="Predictive AI Technology" style="width: 200px; height: 200px; object-fit: contain; flex-shrink: 0; border-radius: 12px;">
+                <span style="flex: 1;"><strong>Predictive AI Technology:</strong> Our proprietary algorithms analyze vehicle data to predict maintenance needs before they become problems.</span>
+              </div>
+              <div class="insight-item info mt-4" style="display: flex; align-items: center; gap: 2rem; padding: 2rem;">
+                <img src="https://i.postimg.cc/W19XWBY7/Comprehensive-Integration.png" alt="Comprehensive Integration" style="width: 200px; height: 200px; object-fit: contain; flex-shrink: 0; border-radius: 12px;">
+                <span style="flex: 1;"><strong>Comprehensive Integration:</strong> Seamlessly connects with service centers, parts suppliers, and insurance providers.</span>
+              </div>
+              <div class="insight-item info mt-4" style="display: flex; align-items: center; gap: 2rem; padding: 2rem;">
+                <img src="https://i.postimg.cc/8zytK2XH/Seamlessly-connects-with-service-centers-parts-suppliers-and-insurance-providers.png" alt="Data-Driven Insights" style="width: 200px; height: 200px; object-fit: contain; flex-shrink: 0; border-radius: 12px;">
+                <span style="flex: 1;"><strong>Data-Driven Insights:</strong> Leverages millions of data points to provide accurate maintenance predictions and cost savings.</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="investor-section">
+            <h3>Business Model</h3>
+            <div class="card mt-4">
+              <ul>
+                <li><span>Subscription Revenue</span> <span style="color: var(--color-success); font-weight: 700;">B2C: €9.99/month</span></li>
+                <li><span>Enterprise Solutions</span> <span style="color: var(--color-success); font-weight: 700;">B2B: Custom pricing</span></li>
+                <li><span>Partnership Commissions</span> <span style="color: var(--color-success); font-weight: 700;">10-15% of referred business</span></li>
+                <li><span>Data Analytics</span> <span style="color: var(--color-success); font-weight: 700;">B2B2C: Licensing fees</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section id="settingsScreen" class="screen" aria-labelledby="settingsTitle">
+        <div class="w-full" style="max-width:560px; margin-inline:auto;">
+          <h2 id="settingsTitle">Application Settings</h2>
+          <p class="mb-4" style="color:var(--color-secondary);">Configure your preferences for AutoCare Pro.</p>
+          <div class="card mt-4">
+            <div class="form-group">
+              <label for="themeToggle">Theme</label>
+              <select id="themeToggle">
+                <option value="light">Light Mode (Default)</option>
+                <option value="dark">Dark Mode</option>
+              </select>
+            </div>
+            <div class="form-group mt-4">
+              <label>Notification Preferences</label>
+              <p style="font-size:0.9rem; color:var(--color-text-muted)">Integration for email, SMS, and in-app push notifications is under development.</p>
+            </div>
+            <div class="form-group mt-4">
+              <label>Data Management</label>
+              <button class="btn-danger btn-sm mt-2" id="resetDataBtn" style="border:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M15 9l-3 3M12 18l-1-1M7 7l1 1"/></svg>
+                Reset Demo Data
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Enhanced Service Detail Modal with Booking Confirmation -->
+  <div id="serviceDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalServiceTitle">
+    <div class="modal-content">
+      <h3 id="modalServiceTitle"></h3>
+      <p id="modalServiceDescription"></p>
+      <ul>
+        <li><span>Due Date</span> <span id="modalServiceDueDate"></span></li>
+        <li><span>Due Mileage</span> <span id="modalServiceDueMileage"></span></li>
+        <li><span>Last Completed</span> <span id="modalServiceLastCompleted"></span></li>
+        <li><span>Estimated Cost</span> <span id="modalServiceEstCost"></span></li>
+      </ul>
+      
+      <!-- Buy Parts Section -->
+      <div class="buy-parts-section">
+        <h4>Buy Parts</h4>
+        <div class="parts-list" id="partsList">
+          <div class="part-item">
+            <img src="https://i.postimg.cc/bwMB1FVr/air-filter.png" alt="Air Filter" class="part-image">
+            <div class="part-info">
+              <div class="part-name">Air Filter</div>
+              <div class="part-price">€35</div>
+            </div>
+            <button class="buy-button">Buy</button>
+          </div>
+          <div class="part-item">
+            <img src="https://i.postimg.cc/mrH6jNKR/brake-fluid.png" alt="Brake Fluid" class="part-image">
+            <div class="part-info">
+              <div class="part-name">Brake Fluid</div>
+              <div class="part-price">€25</div>
+            </div>
+            <button class="buy-button">Buy</button>
+          </div>
+          <div class="part-item">
+            <img src="https://i.postimg.cc/FHqB0nCX/oil.png" alt="Engine Oil" class="part-image">
+            <div class="part-info">
+              <div class="part-name">Engine Oil</div>
+              <div class="part-price">€45</div>
+            </div>
+            <button class="buy-button">Buy</button>
+          </div>
+          <div class="part-item">
+            <img src="https://i.postimg.cc/CxtQb6r1/spark-plugs.png" alt="Spark Plugs" class="part-image">
+            <div class="part-info">
+              <div class="part-name">Spark Plugs</div>
+              <div class="part-price">€60</div>
+            </div>
+            <button class="buy-button">Buy</button>
+          </div>
+          <div class="part-item">
+            <img src="https://i.postimg.cc/JhkdxcSL/tyre-rotation.png" alt="Tyre Rotation" class="part-image">
+            <div class="part-info">
+              <div class="part-name">Tyre Rotation</div>
+              <div class="part-price">€50</div>
+            </div>
+            <button class="buy-button">Buy</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Enhanced Garage Booking Section -->
+      <div class="garage-booking-section">
+        <h4>Book a Service</h4>
+        <div class="time-slots" id="timeSlots"></div>
+        
+        <!-- Booking Confirmation (shown after booking) -->
+        <div class="booking-confirmation" id="bookingConfirmation" style="display: none;">
+          <h4>✓ Service Booked Successfully!</h4>
+          <p>Confirmation details have been sent to your email and phone</p>
+        </div>
+
+        <div class="confirmation-details" id="confirmationDetails" style="display: none;">
+          <h5>Booking Details:</h5>
+          <p><strong>Service:</strong> <span id="confirmationService"></span></p>
+          <p><strong>Date & Time:</strong> <span id="confirmationDateTime"></span></p>
+          <p><strong>Location:</strong> <span id="confirmationLocation">Local Partner Garage</span></p>
+          <p><strong>Confirmation sent to:</strong> <span id="confirmationContact"></span></p>
+        </div>
+
+        <button class="btn-primary" id="bookServiceBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Book Selected Slot
+        </button>
+      </div>
+      
+      <div class="form-group">
+        <label for="modalServiceNotes">Service Notes (Log the work done, garage name, actual parts used)</label>
+        <textarea id="modalServiceNotes" rows="3" placeholder="Add specific notes, mechanic name, garage name, exact cost, or actual parts used..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="closeServiceModal">Close</button>
+        <button class="btn-danger" id="deleteServiceBtn" style="display:none;">Delete</button>
+        <button class="btn-primary" id="markServiceComplete">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          Mark as Completed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 600px;">
+      <h3>Checkout</h3>
+      
+      <!-- Order Summary -->
+      <div class="checkout-section">
+        <h4>Order Summary</h4>
+        <div id="checkoutItems" class="checkout-items">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="checkout-totals">
+          <div class="total-line">
+            <span>Subtotal:</span>
+            <span id="subtotal">€0.00</span>
+          </div>
+          <div class="total-line">
+            <span>Shipping:</span>
+            <span id="shipping">€0.00</span>
+          </div>
+          <div class="total-line total">
+            <span>Total:</span>
+            <span id="total">€0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping Information -->
+      <div class="checkout-section">
+        <h4>Shipping Information</h4>
+        <div class="form-group">
+          <label for="shippingName">Full Name</label>
+          <input type="text" id="shippingName" required>
+        </div>
+        <div class="form-group">
+          <label for="shippingAddress">Address</label>
+          <input type="text" id="shippingAddress" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="shippingCity">City</label>
+            <input type="text" id="shippingCity" required>
+          </div>
+          <div class="form-group">
+            <label for="shippingZip">ZIP Code</label>
+            <input type="text" id="shippingZip" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="checkout-section">
+        <h4>Payment Method</h4>
+        <div class="payment-options">
+          <div class="payment-option">
+            <input type="radio" id="creditCard" name="payment" checked>
+            <label for="creditCard">Credit/Debit Card</label>
+          </div>
+          <div class="payment-option">
+            <input type="radio" id="paypal" name="payment">
+            <label for="paypal">PayPal</label>
+          </div>
+        </div>
+        
+        <!-- Card Details (shown when credit card selected) -->
+        <div id="cardDetails" class="card-details">
+          <div class="form-group">
+            <label for="cardNumber">Card Number</label>
+            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiryDate">Expiry Date</label>
+              <input type="text" id="expiryDate" placeholder="MM/YY">
+            </div>
+            <div class="form-group">
+              <label for="cvv">CVV</label>
+              <input type="text" id="cvv" placeholder="123">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="checkout-actions">
+        <button class="btn-secondary" id="backToCart">Back to Cart</button>
+        <button class="btn-primary" id="completePurchase">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+          Complete Purchase
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Confirmation Modal -->
+  <div id="orderConfirmationModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="order-confirmation">
+        <div class="confirmation-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <h3>Order Confirmed!</h3>
+        <p>Thank you for your purchase. Your order has been successfully processed.</p>
+        
+        <div class="order-summary">
+          <h4>Order Details</h4>
+          <div id="orderSummaryItems">
+            <!-- Dynamically populated -->
+          </div>
+          <div class="order-summary-total">
+            <div class="order-summary-item">
+              <span>Total:</span>
+              <span id="orderTotal">€0.00</span>
+            </div>
+          </div>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: var(--color-text-muted);">
+          A confirmation email has been sent to your email address. Your items will be shipped within 2-3 business days.
+        </p>
+        
+        <div class="modal-actions">
+          <button class="btn-primary" id="continueShopping">Continue Shopping</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pitch / Demo Modal -->
+<div id="demoModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="demoModalTitle">
+  <div class="modal-content">
+    <h3 id="demoModalTitle">Product Walkthrough (Pitch Deck)</h3>
+    <p style="color:var(--color-secondary);">This video highlights the predictive power of AutoCare Pro and our competitive advantage.</p>
+    <div style="background:var(--color-bg-input); border-radius:12px; overflow:hidden; margin:.8rem 0;">
+      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+        <iframe 
+          src="https://www.youtube.com/embed/b-YIfTUfyUg?rel=0" 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 8px;"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen
+          title="AutoCare Pro Product Demo"
+        >
+        </iframe>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="closeDemoBtn">Continue to App</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Full Schedule Modal -->
+  <div id="fullScheduleModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="fullScheduleTitle">
+    <div class="modal-content">
+      <h3 id="fullScheduleTitle">Full Maintenance Schedule</h3>
+      <div id="fullScheduleList" style="max-height:420px; overflow-y:auto; margin-top:1rem;"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="closeFullScheduleBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container (will be populated dynamically) -->
+  <div id="toastHost" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      /* ------------------ Helpers ------------------ */
+      const $ = s => document.querySelector(s);
+      const $$ = s => Array.from(document.querySelectorAll(s));
+      const formatDate = (date) => {
+        if (!date) return '—';
+        const d = (date instanceof Date) ? date : new Date(date);
+        return isNaN(d.getTime()) ? '—' : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      };
+      const formatMileage = (km) => (km || km === 0) ? `${Number(km).toLocaleString()} km` : '—';
+      const addMonths = (date, months) => { const d = new Date(date); d.setMonth(d.getMonth() + months); return d; };
+      const addDays = (date, days) => { const d = new Date(date); d.setDate(d.getDate() + days); return d; };
+      const fmtEUR = n => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+
+      /* ------------------ Element Refs ------------------ */
+      const screens = { 
+        home: $('#homeScreen'),
+        profile: $('#profileScreen'),
+        addCar: $('#addCarScreen'), 
+        dashboard: $('#dashboardScreen'), 
+        investor: $('#investorScreen'),
+        settings: $('#settingsScreen') 
+      };
+      const navButtons = { 
+        home: $('#navHome'), 
+        dashboard: $('#navDashboard'), 
+        investor: $('#navInvestor'),
+        settings: $('#navSettings') 
+      };
+
+      // Profile System Elements
+      const userProfileElement = $('#userProfile');
+      const userAvatar = $('#userAvatar');
+      const userName = $('#userName');
+      const profileForm = $('#profileForm');
+
+      const createPlanBtn = $('#createPlanBtn');
+      const addCarForm = $('#addCarForm');
+      const carDetailsDiv = $('#carDetails');
+      const maintenanceListDiv = $('#maintenanceList');
+      const healthPercentageSpan = $('#healthPercentage');
+      const healthProgressCircle = $('#healthProgressCircle');
+      const healthMessageP = $('#healthMessage');
+      const smartInsightsDiv = $('#smartInsights');
+      const costTrendChartDiv = $('#costTrendChart');
+      const themeToggle = $('#themeToggle');
+      const resetDataBtn = $('#resetDataBtn');
+
+      const serviceDetailModal = $('#serviceDetailModal');
+      const modalServiceTitle = $('#modalServiceTitle');
+      const modalServiceDescription = $('#modalServiceDescription');
+      const modalServiceDueDate = $('#modalServiceDueDate');
+      const modalServiceDueMileage = $('#modalServiceDueMileage');
+      const modalServiceLastCompleted = $('#modalServiceLastCompleted');
+      const modalServiceEstCost = $('#modalServiceEstCost');
+      const modalServiceNotes = $('#modalServiceNotes');
+      const closeServiceModalBtn = $('#closeServiceModal');
+      const deleteServiceBtn = $('#deleteServiceBtn');
+      const markServiceCompleteBtn = $('#markServiceComplete');
+      const partsList = $('#partsList');
+      const timeSlots = $('#timeSlots');
+      const bookServiceBtn = $('#bookServiceBtn');
+      const bookingConfirmation = $('#bookingConfirmation');
+      const confirmationDetails = $('#confirmationDetails');
+      const confirmationService = $('#confirmationService');
+      const confirmationDateTime = $('#confirmationDateTime');
+      const confirmationContact = $('#confirmationContact');
+
+      // Checkout Elements
+      const cartButton = $('#cartButton');
+      const cartBadge = $('#cartBadge');
+      const checkoutModal = $('#checkoutModal');
+      const checkoutItems = $('#checkoutItems');
+      const subtotalElement = $('#subtotal');
+      const shippingElement = $('#shipping');
+      const totalElement = $('#total');
+      const backToCartBtn = $('#backToCart');
+      const completePurchaseBtn = $('#completePurchase');
+      const orderConfirmationModal = $('#orderConfirmationModal');
+      const orderSummaryItems = $('#orderSummaryItems');
+      const orderTotalElement = $('#orderTotal');
+      const continueShoppingBtn = $('#continueShopping');
+
+      const demoModal = $('#demoModal');
+      const watchDemoBtn = $('#watchDemoBtn');
+      const closeDemoBtn = $('#closeDemoBtn');
+
+      const fullScheduleModal = $('#fullScheduleModal');
+      const fullScheduleList = $('#fullScheduleList');
+      const closeFullScheduleBtn = $('#closeFullScheduleBtn');
+      const fullScheduleBtn = $('#fullScheduleBtn');
+
+      const toastHost = $('#toastHost');
+
+      /* ===== ENHANCED PROFILE SYSTEM ===== */
+      
+      const STORAGE_PROFILE_KEY = 'autocare.profile';
+      let userProfileData = null;
+
+      // Multiple Vehicles Management
+      let vehicles = [];
+      let currentVehicleId = null;
+      const STORAGE_VEHICLES_KEY = 'autocare.vehicles';
+      const STORAGE_CURRENT_VEHICLE_KEY = 'autocare.currentVehicle';
+
+      // Shopping Cart
+      let shoppingCart = [];
+      const STORAGE_CART_KEY = 'autocare.cart';
+
+      // Parts data for each service type
+      const SERVICE_PARTS = {
+        'oil-change': [
+          { 
+            name: 'Synthetic Oil 5W-30', 
+            price: 45, 
+            store: 'Partner Store',
+            image: 'https://i.postimg.cc/FHqB0nCX/oil.png'
+          },
+        ],
+        'tire-rotation': [
+          { 
+            name: 'Tire Balancing Weights', 
+            price: 15, 
+            store: 'Partner Store',
+            image: 'https://i.postimg.cc/JhkdxcSL/tyre-rotation.png'
+          },
+        ],
+        'brake-check': [
+          { 
+            name: 'Brake Fluid DOT 4', 
+            price: 25, 
+            store: 'Partner Store',
+            image: 'https://i.postimg.cc/mrH6jNKR/brake-fluid.png'
+          },
+        ],
+        'air-filter': [
+          { 
+            name: 'Engine Air Filter', 
+            price: 30, 
+            store: 'Partner Store',
+            image: 'https://i.postimg.cc/bwMB1FVr/air-filter.png'
+          },
+        ],
+        'spark-plugs': [
+          { 
+            name: 'Spark Plugs (Set of 4)', 
+            price: 60, 
+            store: 'Partner Store',
+            image: 'https://i.postimg.cc/CxtQb6r1/spark-plugs.png'
+          },
+        ]
+      };
+
+      function loadProfile() {
+        const storedProfile = localStorage.getItem(STORAGE_PROFILE_KEY);
+        if (storedProfile) {
+          userProfileData = JSON.parse(storedProfile);
+          updateProfileUI();
+          return true;
+        }
+        return false;
+      }
+
+      function saveProfile() {
+        localStorage.setItem(STORAGE_PROFILE_KEY, JSON.stringify(userProfileData));
+      }
+
+      function updateProfileUI() {
+        if (userProfileData) {
+          // Update header
+          userProfileElement.style.display = 'flex';
+          userName.textContent = userProfileData.fullName;
+          userAvatar.textContent = userProfileData.fullName.charAt(0).toUpperCase();
+        }
+      }
+
+      // Profile Form Handling
+      profileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        userProfileData = {
+          fullName: $('#userFullName').value.trim(),
+          email: $('#userEmail').value.trim(),
+          phone: $('#userPhone').value.trim(),
+          location: $('#userLocation').value.trim(),
+          notifications: {
+            email: $('#emailNotifications').checked,
+            sms: $('#smsNotifications').checked
+          },
+          createdAt: new Date().toISOString()
+        };
+
+        saveProfile();
+        updateProfileUI();
+        
+        // Update progress steps
+        updateProgressSteps(2);
+        
+        // Move to next step: Add Vehicle
+        showScreen('addCar');
+        showToast('Profile created successfully!', 'success');
+      });
+
+      // Notification option click handlers
+      $('#emailOption').addEventListener('click', () => {
+        $('#emailNotifications').checked = !$('#emailNotifications').checked;
+        updateNotificationOptions();
+      });
+
+      $('#smsOption').addEventListener('click', () => {
+        $('#smsNotifications').checked = !$('#smsNotifications').checked;
+        updateNotificationOptions();
+      });
+
+      function updateNotificationOptions() {
+        const emailChecked = $('#emailNotifications').checked;
+        const smsChecked = $('#smsNotifications').checked;
+        
+        $('#emailOption').classList.toggle('selected', emailChecked);
+        $('#smsOption').classList.toggle('selected', smsChecked);
+      }
+
+      // Initialize notification preferences
+      function initializeNotificationPreferences() {
+        // Set initial state based on checkboxes
+        updateNotificationOptions();
+        
+        // Load saved preferences if they exist
+        if (userProfileData && userProfileData.notifications) {
+          $('#emailNotifications').checked = userProfileData.notifications.email;
+          $('#smsNotifications').checked = userProfileData.notifications.sms;
+          updateNotificationOptions();
+        }
+      }
+
+      // Progress steps management
+      function updateProgressSteps(currentStep) {
+        const steps = $$('.progress-step');
+        steps.forEach((step, index) => {
+          step.classList.remove('active', 'completed');
+          if (index + 1 < currentStep) {
+            step.classList.add('completed');
+            step.querySelector('.step-number').textContent = '✓';
+          } else if (index + 1 === currentStep) {
+            step.classList.add('active');
+          }
+        });
+      }
+
+      // Vehicle management
+      function loadVehicles() {
+        const storedVehicles = localStorage.getItem(STORAGE_VEHICLES_KEY);
+        const storedCurrent = localStorage.getItem(STORAGE_CURRENT_VEHICLE_KEY);
+        
+        if (storedVehicles) {
+          vehicles = JSON.parse(storedVehicles);
+        }
+        
+        if (storedCurrent) {
+          currentVehicleId = storedCurrent;
+        } else if (vehicles.length > 0) {
+          currentVehicleId = vehicles[0].id;
+        }
+      }
+
+      function saveVehicles() {
+        localStorage.setItem(STORAGE_VEHICLES_KEY, JSON.stringify(vehicles));
+        if (currentVehicleId) {
+          localStorage.setItem(STORAGE_CURRENT_VEHICLE_KEY, currentVehicleId);
+        }
+      }
+
+      function renderVehicleSwitcher() {
+        const switcher = $('#vehicleSwitcher');
+        switcher.innerHTML = '';
+        
+        if (vehicles.length === 0) {
+          // Show "Add Vehicle" button when no vehicles exist
+          const addBtn = document.createElement('button');
+          addBtn.className = 'vehicle-pill';
+          addBtn.textContent = 'Add Vehicle';
+          addBtn.addEventListener('click', () => showScreen('addCar'));
+          switcher.appendChild(addBtn);
+          return;
+        }
+        
+        vehicles.forEach(vehicle => {
+          const pill = document.createElement('div');
+          pill.className = `vehicle-pill ${vehicle.id === currentVehicleId ? 'active' : ''}`;
+          pill.textContent = `${vehicle.make} ${vehicle.model}`;
+          pill.addEventListener('click', () => {
+            currentVehicleId = vehicle.id;
+            saveVehicles();
+            renderVehicleSwitcher();
+            renderDashboard();
+          });
+          switcher.appendChild(pill);
+        });
+
+        // Add vehicle button
+        const addBtn = document.createElement('button');
+        addBtn.className = 'add-vehicle-btn';
+        addBtn.innerHTML = '+';
+        addBtn.addEventListener('click', () => showScreen('addCar'));
+        switcher.appendChild(addBtn);
+      }
+
+      // Enhanced car creation
+      addCarForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newVehicle = {
+          id: 'vehicle-' + Date.now(),
+          make: document.getElementById('carMake').value.trim(),
+          model: document.getElementById('carModel').value.trim(),
+          year: parseInt(document.getElementById('carYear').value, 10),
+          mileage: parseInt(document.getElementById('currentMileage').value, 10),
+          averageYearlyMileage: parseInt(document.getElementById('averageYearlyMileage').value, 10),
+          lastServiceDate: new Date(document.getElementById('lastServiceDate').value),
+        };
+        
+        vehicles.push(newVehicle);
+        currentVehicleId = newVehicle.id;
+        saveVehicles();
+        renderVehicleSwitcher();
+        
+        // Update progress steps
+        updateProgressSteps(3);
+        
+        generateMaintenancePlan();
+        renderDashboard();
+        showToast('Vehicle added successfully!', 'success');
+      });
+
+      // Enhanced Booking System
+      let selectedTimeSlot = null;
+      
+      bookServiceBtn.addEventListener('click', () => {
+        if (!selectedTimeSlot) {
+          showToast('Please select a time slot first', 'warning');
+          return;
+        }
+        
+        if (!userProfileData) {
+          showToast('Please complete your profile first', 'warning');
+          showScreen('profile');
+          return;
+        }
+        
+        const service = maintenancePlan.find(s => s.id === selectedServiceId);
+        if (service) {
+          const bookingNote = `Booked service for ${formatDate(selectedTimeSlot.date)} at ${selectedTimeSlot.time}`;
+          service.notes = service.notes ? `${service.notes}\n${bookingNote}` : bookingNote;
+          modalServiceNotes.value = service.notes;
+          saveState();
+          
+          // Show booking confirmation
+          showBookingConfirmation(service, selectedTimeSlot);
+          showToast('Service booked successfully! Confirmation sent.', 'success');
+        }
+      });
+
+      function showBookingConfirmation(service, timeSlot) {
+        bookingConfirmation.style.display = 'block';
+        confirmationDetails.style.display = 'block';
+        confirmationService.textContent = service.title;
+        confirmationDateTime.textContent = `${formatDate(timeSlot.date)} at ${timeSlot.time}`;
+        
+        // Show where confirmation was sent
+        const contactMethods = [];
+        if (userProfileData.notifications.email) contactMethods.push('email');
+        if (userProfileData.notifications.sms) contactMethods.push('text message');
+        confirmationContact.textContent = contactMethods.join(' and ');
+        
+        // Simulate sending notifications
+        if (userProfileData.notifications.email) {
+          console.log(`Sending email confirmation to ${userProfileData.email} for ${service.title} on ${formatDate(timeSlot.date)} at ${timeSlot.time}`);
+        }
+        if (userProfileData.notifications.sms) {
+          console.log(`Sending SMS confirmation to ${userProfileData.phone} for ${service.title} on ${formatDate(timeSlot.date)} at ${timeSlot.time}`);
+        }
+      }
+
+      // Shopping Cart Functionality
+      function loadCart() {
+        const storedCart = localStorage.getItem(STORAGE_CART_KEY);
+        if (storedCart) {
+          shoppingCart = JSON.parse(storedCart);
+          updateCartBadge();
+        }
+      }
+
+      function saveCart() {
+        localStorage.setItem(STORAGE_CART_KEY, JSON.stringify(shoppingCart));
+        updateCartBadge();
+      }
+
+      function updateCartBadge() {
+        const itemCount = shoppingCart.reduce((total, item) => total + item.quantity, 0);
+        cartBadge.textContent = itemCount;
+        cartBadge.style.display = itemCount > 0 ? 'flex' : 'none';
+      }
+
+      function addToCart(part) {
+        // Check if item already exists in cart
+        const existingItem = shoppingCart.find(item => item.name === part.name);
+        
+        if (existingItem) {
+          existingItem.quantity += 1;
+        } else {
+          shoppingCart.push({
+            ...part,
+            id: `cart-${Date.now()}`,
+            quantity: 1
+          });
+        }
+        
+        saveCart();
+        showToast(`${part.name} added to cart`, 'success');
+      }
+
+      function removeFromCart(itemId) {
+        shoppingCart = shoppingCart.filter(item => item.id !== itemId);
+        saveCart();
+        if (checkoutModal.classList.contains('active')) {
+          renderCheckoutItems();
+        }
+      }
+
+      function updateCartItemQuantity(itemId, newQuantity) {
+        const item = shoppingCart.find(item => item.id === itemId);
+        if (item) {
+          if (newQuantity <= 0) {
+            removeFromCart(itemId);
+          } else {
+            item.quantity = newQuantity;
+            saveCart();
+            if (checkoutModal.classList.contains('active')) {
+              renderCheckoutItems();
+            }
+          }
+        }
+      }
+
+      function renderCheckoutItems() {
+        checkoutItems.innerHTML = '';
+        
+        if (shoppingCart.length === 0) {
+          checkoutItems.innerHTML = '<p style="text-align: center; color: var(--color-text-muted);">Your cart is empty</p>';
+          return;
+        }
+        
+        shoppingCart.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.className = 'checkout-item';
+          itemElement.innerHTML = `
+            <div>
+              <strong>${item.name}</strong>
+              <div style="font-size: 0.9rem; color: var(--color-text-muted);">
+                Quantity: 
+                <button class="quantity-btn" data-id="${item.id}" data-action="decrease">-</button>
+                <span style="margin: 0 0.5rem;">${item.quantity}</span>
+                <button class="quantity-btn" data-id="${item.id}" data-action="increase">+</button>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="font-weight: 700;">${fmtEUR(item.price * item.quantity)}</div>
+              <button class="btn-danger btn-sm remove-btn" data-id="${item.id}" style="border: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          `;
+          checkoutItems.appendChild(itemElement);
+        });
+
+        // Add event listeners for quantity buttons
+        $$('.quantity-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const itemId = e.target.dataset.id;
+            const action = e.target.dataset.action;
+            const item = shoppingCart.find(item => item.id === itemId);
+            
+            if (item) {
+              if (action === 'increase') {
+                updateCartItemQuantity(itemId, item.quantity + 1);
+              } else if (action === 'decrease') {
+                updateCartItemQuantity(itemId, item.quantity - 1);
+              }
+            }
+          });
+        });
+
+        // Add event listeners for remove buttons
+        $$('.remove-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const itemId = e.target.closest('.remove-btn').dataset.id;
+            removeFromCart(itemId);
+          });
+        });
+
+        calculateTotals();
+      }
+
+      function calculateTotals() {
+        const subtotal = shoppingCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const shipping = subtotal > 50 ? 0 : 4.99; // Free shipping over €50
+        const total = subtotal + shipping;
+        
+        subtotalElement.textContent = fmtEUR(subtotal);
+        shippingElement.textContent = fmtEUR(shipping);
+        totalElement.textContent = fmtEUR(total);
+      }
+
+      function openCheckout() {
+        if (shoppingCart.length === 0) {
+          showToast('Your cart is empty', 'warning');
+          return;
+        }
+        
+        renderCheckoutItems();
+        checkoutModal.classList.add('active');
+      }
+
+      function completePurchase() {
+        if (shoppingCart.length === 0) {
+          showToast('Your cart is empty', 'warning');
+          return;
+        }
+
+        // In a real app, you would process payment here
+        // For demo purposes, we'll just show the confirmation
+        
+        // Render order summary
+        orderSummaryItems.innerHTML = '';
+        let orderTotal = 0;
+        
+        shoppingCart.forEach(item => {
+          const itemTotal = item.price * item.quantity;
+          orderTotal += itemTotal;
+          
+          const itemElement = document.createElement('div');
+          itemElement.className = 'order-summary-item';
+          itemElement.innerHTML = `
+            <span>${item.name} (x${item.quantity})</span>
+            <span>${fmtEUR(itemTotal)}</span>
+          `;
+          orderSummaryItems.appendChild(itemElement);
+        });
+        
+        orderTotalElement.textContent = fmtEUR(orderTotal);
+        
+        // Clear cart
+        shoppingCart = [];
+        saveCart();
+        
+        // Show confirmation
+        checkoutModal.classList.remove('active');
+        orderConfirmationModal.classList.add('active');
+        
+        showToast('Purchase completed successfully!', 'success');
+      }
+
+      // Notification System
+      $('#notificationBell').addEventListener('click', (e) => {
+        e.stopPropagation();
+        $('#notificationPanel').classList.toggle('show');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.notification-center')) {
+          $('#notificationPanel').classList.remove('show');
+        }
+      });
+
+      // Get Started Handler - CORRECT FLOW
+      window.handleGetStarted = function() {
+        const hasProfile = !!userProfileData;
+        const hasVehicles = vehicles.length > 0;
+        
+        if (!hasProfile) {
+          // No profile - go to profile setup
+          showScreen('profile');
+        } else if (!hasVehicles) {
+          // Has profile but no vehicles - go to add car
+          showScreen('addCar');
+        } else {
+          // Has both profile and vehicles - go to dashboard
+          renderDashboard();
+        }
+      };
+
+      // Maintenance Report Generator
+      window.generateMaintenanceReport = function() {
+        const printWindow = window.open('', '_blank');
+        const currentCar = vehicles.find(v => v.id === currentVehicleId);
+        
+        if (!currentCar) return;
+        
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>AutoCare Pro Maintenance Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; }
+              .header { text-align: center; margin-bottom: 30px; }
+              .vehicle-info { margin-bottom: 20px; }
+              .section { margin: 20px 0; }
+              table { width: 100%; border-collapse: collapse; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f2f2f2; }
+              .health-score { font-size: 2em; font-weight: bold; color: #10b981; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>AutoCare Pro Maintenance Report</h1>
+              <p>Generated on ${new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <div class="vehicle-info">
+              <h2>Vehicle Information</h2>
+              <p><strong>${currentCar.year} ${currentCar.make} ${currentCar.model}</strong></p>
+              <p>Current Mileage: ${currentCar.mileage.toLocaleString()} km</p>
+              <p>Last Service: ${formatDate(currentCar.lastServiceDate)}</p>
+            </div>
+            
+            <div class="section">
+              <h2>Overall Health Score: <span class="health-score">85%</span></h2>
+              <p>Excellent condition - well maintained with proactive service schedule</p>
+            </div>
+            
+            <div class="section">
+              <h2>Annual Savings Summary</h2>
+              <p><strong>€420 saved this year</strong> through proactive maintenance vs emergency repairs</p>
+              <p><strong>€2,100 estimated resale value protection</strong> with complete service records</p>
+            </div>
+            
+            <div class="section">
+              <h2>Upcoming Services</h2>
+              <table>
+                <tr><th>Service</th><th>Due Date</th><th>Due Mileage</th><th>Estimated Cost</th></tr>
+                ${maintenancePlan.filter(s => !s.completed).slice(0, 5).map(service => `
+                  <tr>
+                    <td>${service.title}</td>
+                    <td>${formatDate(service.dueDate)}</td>
+                    <td>${formatMileage(service.dueMileage)}</td>
+                    <td>${service.estCost ? fmtEUR(service.estCost) : '—'}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+            
+            <div class="section">
+              <p><em>This report demonstrates comprehensive maintenance history, increasing vehicle value and reliability.</em></p>
+            </div>
+          </body>
+          </html>
+        `);
+        
+        printWindow.document.close();
+        setTimeout(() => {
+          printWindow.print();
+        }, 250);
+      };
+
+      /* ------------------ Toasts ------------------ */
+      function showToast(message, kind = 'success') {
+        const t = document.createElement('div');
+        t.className = `toast toast-${kind}`;
+        t.innerHTML = message;
+        toastHost.appendChild(t);
+        // force reflow before .show
+        void t.offsetWidth;
+        t.classList.add('show');
+        setTimeout(() => {
+          t.classList.remove('show');
+          setTimeout(() => t.remove(), 350);
+        }, 2600);
+      }
+
+      /* ------------------ Data & Storage ------------------ */
+      const STORAGE_CAR_KEY = 'autocare.car';
+      const STORAGE_PLAN_KEY = 'autocare.plan';
+      const STORAGE_THEME_KEY = 'autocare.theme';
+
+      // Base services
+      const BASE_SERVICES = [
+        { id: 'oil-change',     title: 'Oil Change Service',                description: 'Engine oil and filter replacement. Crucial for engine longevity.', mileageInterval: 12000, timeIntervalMonths: 12, estCost: 180 },
+        { id: 'tire-rotation',  title: 'Tire Rotation/Balance',            description: 'Optimize tire wear and handling performance.',                      mileageInterval: 15000, timeIntervalMonths: 12, estCost: 40  },
+        { id: 'brake-check',    title: 'Brake Fluid Flush',                description: 'Replace brake fluid to prevent moisture build-up and corrosion.',  mileageInterval: Infinity, timeIntervalMonths: 24, estCost: 120 },
+        { id: 'air-filter',     title: 'Engine/Cabin Filter Replacement',  description: 'Maintain air quality and engine breathing efficiency.',             mileageInterval: 30000, timeIntervalMonths: 24, estCost: 90  },
+        { id: 'spark-plugs',    title: 'Spark Plug Replacement',           description: 'Replace for optimal combustion efficiency and fuel economy.',      mileageInterval: 60000, timeIntervalMonths: 48, estCost: 250 },
+      ];
+      const BASE_SERVICE_MAP = Object.fromEntries(BASE_SERVICES.map(s => [s.id, s]));
+
+      function nextOccurrenceFromCompletion(base, completedDate, completedMileage) {
+        const dueDate = isFinite(base.timeIntervalMonths) ? addMonths(completedDate, base.timeIntervalMonths) : null;
+        const dueMileage = isFinite(base.mileageInterval) ? (completedMileage + base.mileageInterval) : null;
+        return {
+          id: base.id + '-' + Date.now(),
+          title: base.title,
+          description: base.description,
+          dueMileage,
+          dueDate,
+          lastCompleted: completedDate,
+          completedMileage,
+          estCost: base.estCost,
+          notes: '',
+          completed: false,
+          status: 'Upcoming',
+        };
+      }
+
+      let currentCar = null;
+      let maintenancePlan = [];
+      let selectedServiceId = null;
+
+      /* ------------------ Theme ------------------ */
+      function applyTheme(theme) {
+        document.body.classList.toggle('dark', theme === 'dark');
+        localStorage.setItem(STORAGE_THEME_KEY, theme);
+        if (themeToggle) themeToggle.value = theme;
+      }
+
+      /* ------------------ Screen Management ------------------ */
+      function showScreen(screenName) {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        Object.values(navButtons).forEach(b => b.classList.remove('active'));
+        screens[screenName].classList.add('active');
+        if (navButtons[screenName]) navButtons[screenName].classList.add('active');
+
+        // Update progress steps based on current screen
+        if (screenName === 'profile') {
+          updateProgressSteps(1);
+        } else if (screenName === 'addCar') {
+          updateProgressSteps(2);
+          if (currentCar) {
+            $('#carMake').value = currentCar.make;
+            $('#carModel').value = currentCar.model;
+            $('#carYear').value = currentCar.year;
+            $('#currentMileage').value = currentCar.mileage;
+            $('#averageYearlyMileage').value = currentCar.averageYearlyMileage;
+            const raw = currentCar.lastServiceDate instanceof Date ? currentCar.lastServiceDate : new Date(currentCar.lastServiceDate);
+            $('#lastServiceDate').value = isNaN(raw.getTime()) ? '' : raw.toISOString().slice(0,10);
+          }
+        } else if (screenName === 'dashboard' && vehicles.length > 0) {
+          updateProgressSteps(3);
+        }
+      }
+
+      function updateDashboardNavVisibility() {
+        if (vehicles.length > 0) {
+          navButtons.dashboard.classList.add('visible');
+        } else {
+          navButtons.dashboard.classList.remove('visible');
+        }
+      }
+
+      /* ------------------ Persistence ------------------ */
+      function saveState() {
+        localStorage.setItem(STORAGE_CAR_KEY, JSON.stringify(currentCar));
+        localStorage.setItem(STORAGE_PLAN_KEY, JSON.stringify(maintenancePlan));
+      }
+      function loadState() {
+        const storedCar = localStorage.getItem(STORAGE_CAR_KEY);
+        const storedPlan = localStorage.getItem(STORAGE_PLAN_KEY);
+        const storedTheme = localStorage.getItem(STORAGE_THEME_KEY) || 'light';
+        applyTheme(storedTheme);
+
+        if (storedCar) {
+          currentCar = JSON.parse(storedCar);
+          if (currentCar?.lastServiceDate) currentCar.lastServiceDate = new Date(currentCar.lastServiceDate);
+        }
+        if (storedPlan) {
+          maintenancePlan = JSON.parse(storedPlan).map(s => ({
+            ...s,
+            dueDate: s.dueDate ? new Date(s.dueDate) : null,
+            lastCompleted: s.lastCompleted ? new Date(s.lastCompleted) : null
+          }));
+        }
+      }
+
+      /* ------------------ Plan Generation ------------------ */
+      function generateMaintenancePlan(fromLoad = false) {
+        if (!currentCar) return;
+
+        const { mileage, lastServiceDate, averageYearlyMileage } = currentCar;
+        let newPlan = [];
+        const today = new Date();
+
+        BASE_SERVICES.forEach(base => {
+          const existing = fromLoad ? maintenancePlan.find(s => s.id === base.id) : null;
+          const referenceDate = existing?.lastCompleted || lastServiceDate;
+          const referenceMileage = existing?.completedMileage ?? mileage;
+
+          // Calculate next due mileage
+          let nextDueMileage = isFinite(base.mileageInterval) ? referenceMileage + base.mileageInterval : null;
+          
+          // Calculate next due date - use time interval OR estimate from average yearly mileage
+          let nextDueDate = isFinite(base.timeIntervalMonths) ? addMonths(referenceDate, base.timeIntervalMonths) : null;
+          
+          // If we have average yearly mileage and a mileage-based service, estimate the date
+          if (nextDueMileage && averageYearlyMileage && averageYearlyMileage > 0) {
+            const milesToGo = nextDueMileage - mileage;
+            const estimatedDays = (milesToGo / averageYearlyMileage) * 365;
+            const estimatedDate = addDays(today, estimatedDays);
+            
+            // Use the estimated date if no time interval or if it's sooner
+            if (!nextDueDate || estimatedDate < nextDueDate) {
+              nextDueDate = estimatedDate;
+            }
+          }
+
+          newPlan.push({
+            id: base.id,
+            title: base.title,
+            description: base.description,
+            dueMileage: nextDueMileage,
+            dueDate: nextDueDate,
+            lastCompleted: existing ? existing.lastCompleted : null,
+            completedMileage: existing ? existing.completedMileage : null,
+            estCost: base.estCost,
+            notes: existing ? existing.notes : '',
+            completed: existing ? !!existing.completed : false,
+            status: 'Upcoming'
+          });
+        });
+
+        // Preserve historical completed services
+        newPlan = newPlan.filter(s => !s.completed).concat(maintenancePlan.filter(s => s.completed));
+
+        // Status thresholds
+        const dueDateThreshold = new Date(); dueDateThreshold.setDate(dueDateThreshold.getDate() + 30);
+        const mileageThreshold = currentCar.mileage + 3000;
+
+        newPlan.forEach(service => {
+          if (service.completed) { service.status = 'Completed'; return; }
+          let isOverdue = false, isDueSoon = false;
+          if (service.dueDate && service.dueDate < today) isOverdue = true;
+          if (service.dueMileage && service.dueMileage < currentCar.mileage) isOverdue = true;
+
+          if (!isOverdue) {
+            if (service.dueDate && service.dueDate < dueDateThreshold) isDueSoon = true;
+            if (service.dueMileage && service.dueMileage < mileageThreshold) isDueSoon = true;
+          }
+          service.status = isOverdue ? 'Overdue' : (isDueSoon ? 'Due Soon' : 'Upcoming');
+        });
+
+        // Sort: Overdue -> Due Soon -> Upcoming -> Completed, then by date
+        const order = { 'Overdue': 1, 'Due Soon': 2, 'Upcoming': 3, 'Completed': 4 };
+        newPlan.sort((a, b) => {
+          if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+          const dateA = a.dueDate ? a.dueDate.getTime() : Infinity;
+          const dateB = b.dueDate ? b.dueDate.getTime() : Infinity;
+          return dateA - dateB;
+        });
+
+        maintenancePlan = newPlan;
+        saveState();
+      }
+
+      /* ------------------ Dashboard Render ------------------ */
+      function renderDashboard() {
+        if (vehicles.length === 0) { 
+          // If no vehicles, go to home screen
+          showScreen('home');
+          return; 
+        }
+
+        // Get current vehicle
+        currentCar = vehicles.find(v => v.id === currentVehicleId);
+        if (!currentCar) {
+          currentCar = vehicles[0];
+          currentVehicleId = currentCar.id;
+        }
+
+        generateMaintenancePlan(true);
+
+        // Vehicle details
+        const nextOilChange = maintenancePlan.find(s => (s.id === 'oil-change' || s.id.startsWith('oil-change-')) && !s.completed);
+        const nextOilText = nextOilChange?.dueDate ? formatDate(nextOilChange.dueDate) : '—';
+
+        carDetailsDiv.innerHTML = `
+          <div class="car-name">${currentCar.year} ${currentCar.make} ${currentCar.model}</div>
+          <div class="car-specs">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              ${formatMileage(currentCar.mileage)}
+            </span>
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+              Last Service: ${formatDate(currentCar.lastServiceDate)}
+            </span>
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              Next Oil: ${nextOilText}
+            </span>
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              Yearly Avg: ${formatMileage(currentCar.averageYearlyMileage)}
+            </span>
+          </div>
+        `;
+
+        // Insights
+        const nextSvc = maintenancePlan.find(s => s.status !== 'Completed');
+        const monthsToNext = nextSvc?.dueDate
+          ? Math.max(0, Math.ceil((nextSvc.dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30.4)))
+          : '—';
+        const overdueCount = maintenancePlan.filter(s => s.status === 'Overdue').length;
+        const overdueInsight = overdueCount > 0
+          ? `<div class="insight-item warning">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1010 10A10.012 10.012 0 0012 2zm1 15h-2v-2h2zm0-4h-2V7h2z"/></svg>
+              <span><strong>Critical Alert:</strong> You have ${overdueCount} services past due. Schedule these immediately.</span>
+            </div>`
+          : '';
+
+        smartInsightsDiv.innerHTML = `
+          ${overdueInsight}
+          <div class="insight-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1010 10A10.012 10.012 0 0012 2zm1 15h-2v-6h2zm0-8h-2V7h2v2z"/></svg>
+            <span><strong>Next Major Service:</strong> ${nextSvc?.title || '—'} is due in <strong>~${monthsToNext} months</strong>.</span>
+          </div>
+          <div class="insight-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1010 10A10.012 10.012 0 0012 2z"/></svg>
+            <span><strong>Performance Optimization:</strong> Your ${currentCar.model} is tracking <strong>97% fuel efficiency</strong> relative to its class benchmark.</span>
+          </div>
+        `;
+
+        // Health score calculation
+        const totalServices = maintenancePlan.length || 1;
+        const completedServices = maintenancePlan.filter(s => s.completed).length;
+        const overdueServices = maintenancePlan.filter(s => s.status === 'Overdue').length;
+        const dueSoonServices = maintenancePlan.filter(s => s.status === 'Due Soon').length;
+        
+        // Calculate base score from completed services
+        let baseScore = (completedServices / totalServices) * 100;
+        
+        // Apply penalties for overdue and due soon services
+        let penalty = (overdueServices * 25) + (dueSoonServices * 10);
+        let finalScore = Math.max(0, baseScore - penalty);
+        
+        // Cap at 100 and round
+        finalScore = Math.min(100, Math.round(finalScore));
+
+        healthPercentageSpan.textContent = `${finalScore}%`;
+        const circumference = 377;
+        const offset = circumference - (circumference * finalScore / 100);
+        
+        // Reset and animate the progress circle
+        healthProgressCircle.style.strokeDashoffset = circumference;
+        setTimeout(() => {
+          healthProgressCircle.style.strokeDashoffset = offset;
+        }, 100);
+
+        // Update health message and color based on score
+        if (finalScore >= 90) { 
+          healthMessageP.textContent = 'Excellent! Your car is in top shape.'; 
+          healthProgressCircle.style.stroke = 'var(--color-success)'; 
+        }
+        else if (finalScore >= 70) { 
+          healthMessageP.textContent = 'Good! Keep up with upcoming services.'; 
+          healthProgressCircle.style.stroke = 'var(--color-primary)'; 
+        }
+        else if (finalScore >= 50) { 
+          healthMessageP.textContent = 'Fair! Some attention needed soon.'; 
+          healthProgressCircle.style.stroke = 'var(--color-warning)'; 
+        }
+        else { 
+          healthMessageP.textContent = 'Needs attention! Schedule maintenance soon.'; 
+          healthProgressCircle.style.stroke = 'var(--color-danger)'; 
+        }
+
+        // Maintenance List (top 5)
+        maintenanceListDiv.innerHTML = '';
+        maintenancePlan.slice(0, 5).forEach(service => {
+          const item = document.createElement('div');
+          item.classList.add('maintenance-item', service.status.toLowerCase().replace(' ', '-'));
+          item.dataset.serviceId = service.id;
+
+          let dueText = 'Scheduled';
+          if (service.dueMileage && service.dueDate) dueText = `By ${formatMileage(service.dueMileage)} or ${formatDate(service.dueDate)}`;
+          else if (service.dueMileage) dueText = `By ${formatMileage(service.dueMileage)}`;
+          else if (service.dueDate) dueText = `By ${formatDate(service.dueDate)}`;
+
+          item.innerHTML = `
+            <div class="details">
+              <strong>${service.title}</strong>
+              <span>${dueText}</span>
+            </div>
+            <span class="status">${service.status}</span>
+          `;
+          
+          // Add "Book Now" icon for upcoming services
+          if (!service.completed) {
+            const bookNowIcon = document.createElement('div');
+            bookNowIcon.className = 'book-now-icon';
+            bookNowIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+            bookNowIcon.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openServiceModal(service.id);
+            });
+            item.appendChild(bookNowIcon);
+          }
+          
+          item.addEventListener('click', () => openServiceModal(service.id));
+          maintenanceListDiv.appendChild(item);
+        });
+
+        // Chart
+        renderCostTrendChart();
+
+        // Save + show
+        saveState();
+        updateDashboardNavVisibility();
+        showScreen('dashboard');
+      }
+
+      /* ------------------ Chart ------------------ */
+      function renderCostTrendChart() {
+        costTrendChartDiv.innerHTML = '';
+        const mockCosts = [
+          { label: new Date().getFullYear() - 3, cost: 450, type: '' },
+          { label: new Date().getFullYear() - 2, cost: 380, type: '' },
+          { label: new Date().getFullYear() - 1, cost: 200, type: 'savings' },
+          { label: new Date().getFullYear(),     cost: 150, type: 'savings' }
+        ];
+        const maxCost = Math.max(...mockCosts.map(mc => mc.cost));
+
+        mockCosts.forEach((data, i) => {
+          const bar = document.createElement('div');
+          bar.classList.add('chart-bar');
+          if (data.type === 'savings') bar.classList.add('savings');
+          bar.setAttribute('data-value', fmtEUR(data.cost));
+          bar.innerHTML = `<span>${data.label}</span>`;
+          costTrendChartDiv.appendChild(bar);
+          requestAnimationFrame(() => {
+            setTimeout(() => { bar.style.height = `${(data.cost / maxCost) * 85 + 15}%`; }, 70 * i);
+          });
+        });
+      }
+
+      /* ------------------ Service Detail Modal ------------------ */
+      function openServiceModal(serviceId) {
+        selectedServiceId = serviceId;
+        selectedTimeSlot = null;
+        bookingConfirmation.style.display = 'none';
+        confirmationDetails.style.display = 'none';
+        
+        const service = maintenancePlan.find(s => s.id === serviceId);
+        if (!service) return;
+
+        modalServiceTitle.textContent = service.title;
+        modalServiceDescription.textContent = service.description;
+        modalServiceDueDate.textContent = service.dueDate ? formatDate(service.dueDate) : '—';
+        modalServiceDueMileage.textContent = service.dueMileage ? formatMileage(service.dueMileage) : '—';
+        const lastCompletedChunk = service.lastCompleted ? `${formatDate(service.lastCompleted)}${service.completedMileage ? ' @ ' + formatMileage(service.completedMileage) : ''}` : 'Never';
+        modalServiceLastCompleted.textContent = lastCompletedChunk;
+        modalServiceEstCost.textContent = service.estCost ? `${fmtEUR(service.estCost)} (Estimate)` : '—';
+        modalServiceNotes.value = service.notes || '';
+
+        markServiceCompleteBtn.disabled = service.completed;
+        markServiceCompleteBtn.textContent = service.completed ? 'Service Already Logged' : 'Mark as Completed';
+        deleteServiceBtn.style.display = service.id.startsWith('custom-') ? 'inline-flex' : 'none';
+
+        // Populate parts list WITH ACTUAL IMAGES
+        populatePartsList(service.id);
+
+        // Populate time slots
+        populateTimeSlots();
+
+        serviceDetailModal.classList.add('active');
+      }
+
+      // UPDATED FUNCTION WITH ACTUAL IMAGES AND CORRECT BASE-KEY RESOLUTION
+      function populatePartsList(serviceId) {
+        partsList.innerHTML = '';
+
+        // Find the matching SERVICE_PARTS key. Handles base ids and generated ids like "oil-change-169..."
+        const partsKey = Object.keys(SERVICE_PARTS).find(k => serviceId === k || serviceId.startsWith(k + '-'));
+        const parts = SERVICE_PARTS[partsKey] || [];
+        
+        if (parts.length === 0) {
+          partsList.innerHTML = '<p style="color: var(--color-text-muted); text-align: center;">No parts available for this service</p>';
+          return;
+        }
+
+        parts.forEach(part => {
+          const partItem = document.createElement('div');
+          partItem.className = 'part-item';
+          partItem.innerHTML = `
+            <img src="${part.image}" alt="${part.name}" class="part-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSI+PHJlY3QgeD0iMTIiIHk9IjEyIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHJ4PSI0IiBmaWxsPSIjZjBmNGY4IiBzdHJva2U9IiMyNTYzZWIiIHN0cm9rZS13aWR0aD0iMiIvPjxwYXRoIGQ9Ik0yNCAyNGgxNk0yNCAzMmgxNk0yNCA0MGgxNiIgc3Ryb2tlPSIjMjU2M2ViIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=='">
+            <div class="part-info">
+              <div class="part-name">${part.name}</div>
+              <div class="part-price">${fmtEUR(part.price)} from ${part.store}</div>
+            </div>
+            <button class="buy-button">Buy</button>
+          `;
+          partsList.appendChild(partItem);
+        });
+
+        // Add event listeners for buy buttons
+        $$('.buy-button').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const partItem = e.target.closest('.part-item');
+            const partName = partItem.querySelector('.part-name').textContent;
+            const partPrice = partItem.querySelector('.part-price').textContent;
+            
+            // Find the part data
+            const part = parts.find(p => p.name === partName);
+            if (part) {
+              addToCart(part);
+            }
+          });
+        });
+      }
+
+      function populateTimeSlots() {
+        timeSlots.innerHTML = '';
+        selectedTimeSlot = null;
+        
+        // Generate mock time slots (3 options)
+        const today = new Date();
+        const slots = [
+          { date: addDays(today, 2), time: '09:00 AM' },
+          { date: addDays(today, 2), time: '01:30 PM' },
+          { date: addDays(today, 3), time: '10:30 AM' }
+        ];
+
+        slots.forEach(slot => {
+          const slotElement = document.createElement('div');
+          slotElement.className = 'time-slot';
+          slotElement.innerHTML = `
+            <div class="time-slot-date">${formatDate(slot.date)}</div>
+            <div class="time-slot-time">${slot.time}</div>
+          `;
+          
+          slotElement.addEventListener('click', () => {
+            // Deselect all slots
+            $$('.time-slot').forEach(s => s.classList.remove('selected'));
+            // Select this slot
+            slotElement.classList.add('selected');
+            selectedTimeSlot = slot;
+          });
+          
+          timeSlots.appendChild(slotElement);
+        });
+      }
+
+      function closeServiceModal() { 
+        serviceDetailModal.classList.remove('active'); 
+        selectedTimeSlot = null;
+        bookingConfirmation.style.display = 'none';
+        confirmationDetails.style.display = 'none';
+      }
+      
+      closeServiceModalBtn.addEventListener('click', closeServiceModal);
+      serviceDetailModal.addEventListener('click', (e) => { if (e.target === serviceDetailModal) closeServiceModal(); });
+
+      // Mark as completed → create next recurrence
+      markServiceCompleteBtn.addEventListener('click', () => {
+        const idx = maintenancePlan.findIndex(s => s.id === selectedServiceId);
+        if (idx === -1) return;
+
+        const now = new Date();
+        const svc = maintenancePlan[idx];
+
+        svc.completed = true;
+        svc.status = 'Completed';
+        svc.lastCompleted = now;
+        svc.completedMileage = currentCar.mileage;
+        svc.notes = modalServiceNotes.value || svc.notes;
+
+        // Resolve the correct base key from BASE_SERVICE_MAP (handles ids like "oil-change-169...")
+        const baseKey = Object.keys(BASE_SERVICE_MAP).find(k => svc.id === k || svc.id.startsWith(k + '-'));
+        const base = baseKey ? BASE_SERVICE_MAP[baseKey] : null;
+        if (base) {
+          const next = nextOccurrenceFromCompletion(base, now, currentCar.mileage);
+          maintenancePlan.push(next);
+        }
+
+        generateMaintenancePlan(true);
+        renderDashboard();
+        serviceDetailModal.classList.remove('active');
+        showToast('Service marked as completed.', 'success');
+      });
+
+      // Full Schedule Modal
+      if (fullScheduleBtn) {
+        fullScheduleBtn.addEventListener('click', () => {
+          fullScheduleList.innerHTML = '';
+          maintenancePlan.forEach(service => {
+            const item = document.createElement('div');
+            item.classList.add('maintenance-item', service.status.toLowerCase().replace(' ', '-'));
+            item.dataset.serviceId = service.id;
+
+            let dueText = 'Scheduled';
+            if (service.dueMileage && service.dueDate) dueText = `By ${formatMileage(service.dueMileage)} or ${formatDate(service.dueDate)}`;
+            else if (service.dueMileage) dueText = `By ${formatMileage(service.dueMileage)}`;
+            else if (service.dueDate) dueText = `By ${formatDate(service.dueDate)}`;
+
+            item.innerHTML = `
+              <div class="details">
+                <strong>${service.title}</strong>
+                <span>${dueText}</span>
+              </div>
+              <span class="status">${service.status}</span>
+            `;
+            
+            // Add "Book Now" icon for upcoming services in full schedule too
+            if (!service.completed) {
+              const bookNowIcon = document.createElement('div');
+              bookNowIcon.className = 'book-now-icon';
+              bookNowIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+              bookNowIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openServiceModal(service.id);
+                fullScheduleModal.classList.remove('active');
+              });
+              item.appendChild(bookNowIcon);
+            }
+            
+            item.addEventListener('click', () => {
+              openServiceModal(service.id);
+              fullScheduleModal.classList.remove('active');
+            });
+            fullScheduleList.appendChild(item);
+          });
+          fullScheduleModal.classList.add('active');
+        });
+      }
+      closeFullScheduleBtn.addEventListener('click', () => fullScheduleModal.classList.remove('active'));
+      fullScheduleModal.addEventListener('click', (e) => { if (e.target === fullScheduleModal) fullScheduleModal.classList.remove('active'); });
+
+      /* ------------------ Reset Demo Data ------------------ */
+      function resetDemoData() {
+        // Clear localStorage
+        localStorage.removeItem(STORAGE_CAR_KEY);
+        localStorage.removeItem(STORAGE_PLAN_KEY);
+        localStorage.removeItem(STORAGE_VEHICLES_KEY);
+        localStorage.removeItem(STORAGE_CURRENT_VEHICLE_KEY);
+        localStorage.removeItem(STORAGE_PROFILE_KEY);
+        localStorage.removeItem(STORAGE_CART_KEY);
+        
+        // Reset variables
+        currentCar = null;
+        maintenancePlan = [];
+        vehicles = [];
+        currentVehicleId = null;
+        userProfileData = null;
+        shoppingCart = [];
+        
+        // Reset UI
+        userProfileElement.style.display = 'none';
+        renderVehicleSwitcher();
+        updateDashboardNavVisibility();
+        updateCartBadge();
+        
+        // Show home screen
+        showScreen('home');
+        
+        showToast('Demo data reset successfully!', 'success');
+      }
+
+      if (resetDataBtn) {
+        resetDataBtn.addEventListener('click', resetDemoData);
+      }
+
+      /* ------------------ Event Listeners ------------------ */
+      // Navigation
+      Object.entries(navButtons).forEach(([screenName, btn]) => {
+        btn.addEventListener('click', () => showScreen(screenName));
+      });
+
+      // Theme toggle
+      if (themeToggle) {
+        themeToggle.addEventListener('change', (e) => applyTheme(e.target.value));
+      }
+
+      // Shopping Cart
+      cartButton.addEventListener('click', openCheckout);
+
+      // Checkout
+      backToCartBtn.addEventListener('click', () => {
+        checkoutModal.classList.remove('active');
+      });
+
+      completePurchaseBtn.addEventListener('click', completePurchase);
+
+      continueShoppingBtn.addEventListener('click', () => {
+        orderConfirmationModal.classList.remove('active');
+      });
+
+      // Demo modal
+      if (watchDemoBtn) watchDemoBtn.addEventListener('click', () => demoModal.classList.add('active'));
+      if (closeDemoBtn) closeDemoBtn.addEventListener('click', () => demoModal.classList.remove('active'));
+      demoModal.addEventListener('click', (e) => { if (e.target === demoModal) demoModal.classList.remove('active'); });
+
+      /* ------------------ Initialization ------------------ */
+      function init() {
+        // Load profile first
+        const hasProfile = loadProfile();
+        
+        // Load vehicles and current vehicle
+        loadVehicles();
+        
+        // Load app state
+        loadState();
+        
+        // Load cart
+        loadCart();
+        
+        // Initialize notification preferences
+        initializeNotificationPreferences();
+        
+        // Render vehicle switcher
+        renderVehicleSwitcher();
+        
+        // Update dashboard nav visibility
+        updateDashboardNavVisibility();
+        
+        // If we have vehicles, render dashboard, otherwise show home
+        if (vehicles.length > 0) {
+          renderDashboard();
+        } else {
+          showScreen('home');
+        }
+        
+        // Set up initial progress steps
+        if (hasProfile && vehicles.length > 0) {
+          updateProgressSteps(3); // All steps completed
+        } else if (hasProfile) {
+          updateProgressSteps(2); // Profile done, need vehicle
+        } else {
+          updateProgressSteps(1); // Start with profile
+        }
+        
+        // Show profile completion message if needed
+        if (hasProfile && vehicles.length === 0) {
+          showToast('Profile created! Now add your vehicle to get started.', 'success');
+        }
+      }
+
+      // Start the application
+      init();
+    });
+  </script>
+</body>
+</html>
